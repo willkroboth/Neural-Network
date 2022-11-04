@@ -19,6 +19,10 @@ public abstract class Layer<NeuronType extends Neuron> implements Iterable<Neuro
         neurons = Util.newArrayFromSupplier(size, arrayCreator, neuronCreator);
     }
 
+    protected Layer(int size, IntFunction<NeuronType[]> arrayCreator, IntFunction<NeuronType> neuronCreator) {
+        neurons = Util.newArrayFromIndex(size, arrayCreator, neuronCreator);
+    }
+
     public int size() {
         return neurons.length;
     }

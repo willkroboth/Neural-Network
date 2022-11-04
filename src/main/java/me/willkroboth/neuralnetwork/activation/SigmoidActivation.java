@@ -14,11 +14,12 @@ public class SigmoidActivation implements ActivationFunction {
     }
     @Override
     public double of(double x) {
-        return 1/(1+eTo(x));
+        return 1/(1+eTo(-x));
     }
 
     @Override
     public double derivative(double x) {
-        return eTo(x)/Math.pow(eTo(x) + 1, 2);
+        double eToNegX = eTo(-x);
+        return eToNegX/Math.pow(eToNegX + 1, 2);
     }
 }

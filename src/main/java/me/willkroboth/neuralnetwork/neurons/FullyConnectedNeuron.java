@@ -7,27 +7,66 @@ import me.willkroboth.neuralnetwork.layers.Layer;
 import java.util.function.Supplier;
 
 public class FullyConnectedNeuron extends Neuron {
-    private final Layer<?> previousLayer;
     private final ActivationFunction activationFunction;
-    private Double[] weights;
+    private double weightedSum;
     private double bias;
+    private double accumulatedDCdb = 0;
 
     public FullyConnectedNeuron(Layer<?> previousLayer, Supplier<Double> parameterSupplier, ActivationFunction activationFunction) {
-        this.previousLayer = previousLayer;
-        for (Neuron neuron : previousLayer) {
-            neuron.addDependentNeuron(this);
-        }
-        weights = Util.newArrayFromSupplier(previousLayer.size(), Double[]::new, parameterSupplier);
+        previousLayer.forEach((neuron -> linkInputNeuron(neuron, parameterSupplier.get())));
         bias = parameterSupplier.get();
         this.activationFunction = activationFunction;
     }
 
     @Override
     protected double recalculateActivation() {
-        double activation = bias;
-        for (int i = 0; i < weights.length; i++) {
-            activation += previousLayer.getNeuron(i).getActivation() * weights[i];
+        weightedSum = bias;
+        for (Axon axon : inputAxons) {
+            weightedSum += axon.getInputNeuron().getActivation() * axon.getWeight();
         }
-        return activationFunction.of(activation);
+        return activationFunction.of(weightedSum);
+    }
+
+    @Override
+    protected double recalculateDCdN() {
+        double dCdN = 0;
+        for(Axon axon : outputAxons) {
+            dCdN += axon.getWeight() * axon.getOutputNeuron().dCdN();
+        }
+        return dCdN;
+    }
+
+    @Override
+    protected void calculateGradients() {
+        double dNds = activationFunction.derivative(weightedSum);
+        double dCds = dCdN() * dNds;
+
+        double dsdb = 1;
+        double dCdb = dCds * dsdb;
+        accumulatedDCdb += dCdb;
+
+        for(Axon axon : inputAxons) {
+            axon.calculateGradients(true, dCds);
+        }
+    }
+
+    @Override
+    protected void applyGradients(int examplesProcessed) {
+        bias = Util.updateValue(accumulatedDCdb/examplesProcessed, bias);
+        accumulatedDCdb = 0;
+
+        for (Axon axon : inputAxons) {
+            axon.applyGradients(true, examplesProcessed);
+        }
+    }
+
+    public void printInformation() {
+        System.out.printf("Bias: %s ", bias);
+        int weightIndex = 0;
+        for(Axon axon: inputAxons) {
+            System.out.printf("Weight %s: %s ", weightIndex, axon.getWeight());
+            weightIndex++;
+        }
+        System.out.println();
     }
 }
