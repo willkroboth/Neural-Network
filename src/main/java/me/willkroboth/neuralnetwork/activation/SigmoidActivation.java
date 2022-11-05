@@ -20,6 +20,7 @@ public class SigmoidActivation implements ActivationFunction {
     @Override
     public double derivative(double x) {
         double eToNegX = eTo(-x);
+        if(Double.isInfinite(eToNegX)) return 0;
         return eToNegX/Math.pow(eToNegX + 1, 2);
     }
 }
