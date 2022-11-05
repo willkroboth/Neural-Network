@@ -56,7 +56,7 @@ public class Network {
             MSE /= batchSize;
             System.out.printf("Epoch: %s, Cost: %s%n", j, MSE);
 
-            outputLayer.applyGradients(inputs.length);
+            outputLayer.applyGradients(batchSize);
         }
         double MSE = 0;
         for (int i = 0; i < inputs.length; i++) {
@@ -69,6 +69,19 @@ public class Network {
         }
         MSE /= inputs.length;
         System.out.printf("Final Cost: %s%n", MSE);
+    }
+
+    public void test(double[][] inputs, double[][] outputs) {
+        int correct = 0;
+        for (int i = 0; i < inputs.length; i++) {
+            double[] result = predict(inputs[i]);
+
+            int correctChoice = Util.argMax(outputs[i]);
+            int prediction = Util.argMax(result);
+            System.out.printf("Correct: %s, Predicted: %s%n", correctChoice, prediction);
+            if(correctChoice == prediction) correct++;
+        }
+        System.out.printf("%s/%s examples classified correctly%n", correct, inputs.length);
     }
 
     public void printParameters() {

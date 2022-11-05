@@ -1,10 +1,109 @@
 package me.willkroboth.neuralnetwork;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        seedsData();
+    }
+
+    private static String readFile(String directory, String fileName) throws IOException {
+        try {
+            return Files.readString(Path.of(directory + fileName), StandardCharsets.US_ASCII);
+        } catch (IOException e) {
+            System.out.println("File input for \"" + directory + fileName + "\" failed:");
+            throw e;
+        }
+    }
+
+    private static double[][][] testTrainSplit(double[][] inputs, double[][] outputs, double percentTrain) {
+        Integer[] indexes = new Integer[inputs.length];
+        Arrays.setAll(indexes, (i) -> i);
+        Arrays.sort(indexes, (i, j) -> Math.random() > 0.5 ? -1 : 1);
+        System.out.println(Arrays.toString(indexes));
+
+        int countTrain = (int) (percentTrain * inputs.length);
+        double[][] trainInput = new double[countTrain][inputs[0].length];
+        double[][] trainOutput = new double[countTrain][outputs[0].length];
+        int i;
+        for(i = 0; i < countTrain; i++) {
+            trainInput[i] = inputs[indexes[i]];
+            trainOutput[i] = outputs[indexes[i]];
+        }
+
+        int countTest = inputs.length - countTrain;
+        double[][] testInput = new double[countTest][inputs[0].length];
+        double[][] testOutput = new double[countTest][outputs[0].length];
+        for(; i < inputs.length; i++) {
+            testInput[i-countTrain] = inputs[indexes[i]];
+            testOutput[i-countTrain] = outputs[indexes[i]];
+        }
+
+        System.out.println("Train Input");
+        System.out.println(Arrays.deepToString(trainInput));
+        System.out.println("Train Output");
+        System.out.println(Arrays.deepToString(trainOutput));
+        System.out.println("Test Input");
+        System.out.println(Arrays.deepToString(testInput));
+        System.out.println("Test Output");
+        System.out.println(Arrays.deepToString(testOutput));
+
+        return new double[][][]{trainInput, trainOutput, testInput, testOutput};
+    }
+
+    public static void seedsData() {
+        double[][][] data = readSeedData();
+        double[][] inputs = data[0];
+        double[][] outputs = data[1];
+
+        double[][][] split = testTrainSplit(inputs, outputs, 0.9);
+        double[][] trainInput = split[0];
+        double[][] trainOutput = split[1];
+        double[][] testInput = split[2];
+        double[][] testOutput = split[3];
+
+        Network model = new Network(inputs[0].length, 15, 15, 15, outputs[0].length);
+        model.train(trainInput, trainOutput, 1000, 50);
+
+        model.printParameters();
+
+        model.test(testInput, testOutput);
+    }
+
+    private static double[][][] readSeedData() {
+        String rawInput;
+        try {
+            rawInput = readFile("/Users/wk48343/Desktop/Java Programs/Neural-Network/", "seeds_dataset.txt");
+        } catch (IOException e) {
+            throw new TerminateProgram(e);
+        }
+        System.out.println("Raw data:");
+        System.out.println(rawInput);
+        String[] entries = rawInput.split("\n");
+        double[][] inputs = new double[entries.length][7];
+        double[][] outputs = new double[entries.length][3];
+        for (int i = 0; i < entries.length; i++) {
+            String[] data = entries[i].split("\t");
+            for (int j = 0; j < 7; j++) {
+                inputs[i][j] = Double.parseDouble(data[j]);
+            }
+
+            int choice = Integer.parseInt(data[7]);
+            outputs[i][choice-1] = 1;
+        }
+        System.out.println("Processed input");
+        System.out.println(Arrays.deepToString(inputs));
+        System.out.println("Processed outputs");
+        System.out.println(Arrays.deepToString(outputs));
+        return new double[][][]{inputs, outputs};
+    }
+
+    public static void testPetalData() {
         Scanner userInput = new Scanner(System.in);
 
         double[][] inputs = new double[][]{

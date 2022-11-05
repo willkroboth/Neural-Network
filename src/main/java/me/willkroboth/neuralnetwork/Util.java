@@ -26,4 +26,16 @@ public class Util {
     public static double updateValue(double derivative, double value) {
         return value - learningRate * derivative;
     }
+
+    public static int argMax(double[] values) {
+        double maxValue = values[0];
+        int maxIndex = 0;
+        for (int i = 1; i < values.length; i++) {
+            if(values[i] > maxValue) {
+                maxValue = values[i];
+                maxIndex = i;
+            }
+        }
+        return maxIndex;
+    }
 }
