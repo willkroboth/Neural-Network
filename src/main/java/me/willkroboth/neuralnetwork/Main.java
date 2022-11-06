@@ -24,7 +24,13 @@ public class Main {
     private static double[][][] testTrainSplit(double[][] inputs, double[][] outputs, double percentTrain) {
         Integer[] indexes = new Integer[inputs.length];
         Arrays.setAll(indexes, (i) -> i);
-        Arrays.sort(indexes, (i, j) -> Math.random() > 0.5 ? -1 : 1);
+        // Shuffle array
+        for (int i = indexes.length - 1; i > 0; i--) {
+            int j = (int) (Math.random() * (i + 1));
+            int temp = indexes[j];
+            indexes[j] = indexes[i];
+            indexes[i] = temp;
+        }
         System.out.println(Arrays.toString(indexes));
 
         int countTrain = (int) (percentTrain * inputs.length);
