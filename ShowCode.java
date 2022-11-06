@@ -17,7 +17,6 @@ public class Neuron {
         activation = activationFunction.of(weightedSum);
     }
 
-public class Neuron {
     calculateGradients() {
         double dCdN;
         if(outputAxons.size() == 0) {
@@ -40,6 +39,15 @@ public class Neuron {
             axon.calculateGradients(dCds);
         }
     }
+
+    applyGradients(int examplesProcessed) {
+        bias = Util.updateValue(accumulatedDCdb/examplesProcessed, bias);
+        accumulatedDCdb = 0;
+
+        for (Axon axon : inputAxons) {
+            axon.applyGradients(true, examplesProcessed);
+        }
+    }
 }
 
 public class Axon {
@@ -55,6 +63,14 @@ public class Axon {
         accumulatedDCdW += dCdw;
 
         input.calculateGradients();
+    }
+
+    applyGradients(boolean updateWeight, int examplesProcessed) {
+        if (updateWeight) {
+            weight = Util.updateValue(accumulatedDCdW/examplesProcessed, weight);
+            accumulatedDCdW = 0;
+        }
+        input.applyGradients(examplesProcessed);
     }
 }
 
