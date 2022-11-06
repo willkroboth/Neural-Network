@@ -94,3 +94,10 @@ public class SigmoidActivation implements ActivationFunction {
         return eToNegX/Math.pow(eToNegX + 1, 2);
     }
 }
+
+public class Util {
+    double learningRate = 0.01;
+    double updateValue(double derivative, double value) {
+        return value - learningRate * derivative;
+    }
+}
