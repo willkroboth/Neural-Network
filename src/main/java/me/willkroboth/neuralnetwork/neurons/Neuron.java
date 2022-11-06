@@ -35,13 +35,12 @@ public abstract class Neuron {
     protected abstract void applyGradients(int examplesProcessed);
 
     // Keep track of inputs and outputs
-    protected List<Axon> inputAxons = new ArrayList<>();
-    protected List<Axon> outputAxons = new ArrayList<>();
-    protected Axon linkInputNeuron(Neuron input, double initialWeight) {
+    protected final List<Axon> inputAxons = new ArrayList<>();
+    protected final List<Axon> outputAxons = new ArrayList<>();
+    protected void linkInputNeuron(Neuron input, double initialWeight) {
         Axon axon = new Axon(input, this, initialWeight);
         this.inputAxons.add(axon);
         input.outputAxons.add(axon);
-        return axon;
     }
 
     private boolean activationUpdated = false;

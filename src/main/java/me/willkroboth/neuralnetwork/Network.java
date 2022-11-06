@@ -6,8 +6,6 @@ import me.willkroboth.neuralnetwork.layers.Layer;
 import me.willkroboth.neuralnetwork.layers.OutputLayer;
 import me.willkroboth.neuralnetwork.neurons.FullyConnectedNeuron;
 
-import java.util.List;
-
 public class Network {
     private final InputLayer inputLayer;
     private final OutputLayer outputLayer;
@@ -37,32 +35,38 @@ public class Network {
         outputLayer.calculateGradients();
     }
 
+    public void train(double[][] inputs, double[][] outputs, int epochs) {
+        train(inputs, outputs, epochs, inputs.length);
+    }
+
     public void train(double[][] inputs, double[][] outputs, int epochs, int batchSize) {
         if(inputs.length != outputs.length)
             throw new IllegalArgumentException("Expected inputs (%s) to correspond to outputs (%s)".formatted(inputs.length, outputs.length));
+        {
+            int i = 0;
+            for (int j = 0; j < epochs; j++) {
+                double MSE = 0;
+                for (int c = 0; c < batchSize; c++) {
+                    double[] prediction = predict(inputs[i]);
+                    for (int k = 0; k < outputs[i].length; k++) {
+                        MSE += Math.pow(prediction[k] - outputs[i][k], 2);
+                    }
 
-        for(int j = 0; j < epochs; j++) {
-            double MSE = 0;
-            for (int c = 0; c < batchSize; c++) {
-                int i = (int) (Math.random() * inputs.length);
-
-                double[] predicition = predict(inputs[i]);
-                for(int k = 0; k < outputs[i].length; k++) {
-                    MSE += Math.pow(predicition[k] - outputs[i][k], 2);
+                    applyTrainingExample(inputs[i], outputs[i]);
+                    i++;
+                    i %= inputs.length;
                 }
+                MSE /= batchSize;
+                System.out.printf("Epoch: %s, Cost: %s%n", j, MSE);
 
-                applyTrainingExample(inputs[i], outputs[i]);
+                outputLayer.applyGradients(batchSize);
             }
-            MSE /= batchSize;
-            System.out.printf("Epoch: %s, Cost: %s%n", j, MSE);
-
-            outputLayer.applyGradients(batchSize);
         }
         double MSE = 0;
         for (int i = 0; i < inputs.length; i++) {
-            double[] predicition = predict(inputs[i]);
+            double[] prediction = predict(inputs[i]);
             for(int k = 0; k < outputs[i].length; k++) {
-                MSE += Math.pow(predicition[k] - outputs[i][k], 2);
+                MSE += Math.pow(prediction[k] - outputs[i][k], 2);
             }
 
             applyTrainingExample(inputs[i], outputs[i]);
@@ -71,14 +75,14 @@ public class Network {
         System.out.printf("Final Cost: %s%n", MSE);
     }
 
-    public void test(double[][] inputs, double[][] outputs) {
+    public void test(double[][] inputs, double[][] outputs, boolean displayEachGuess) {
         int correct = 0;
         for (int i = 0; i < inputs.length; i++) {
             double[] result = predict(inputs[i]);
 
             int correctChoice = Util.argMax(outputs[i]);
             int prediction = Util.argMax(result);
-            System.out.printf("Correct: %s, Predicted: %s%n", correctChoice, prediction);
+            if(displayEachGuess) System.out.printf("Correct: %s, Predicted: %s%n", correctChoice, prediction);
             if(correctChoice == prediction) correct++;
         }
         System.out.printf("%s/%s examples classified correctly%n", correct, inputs.length);

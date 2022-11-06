@@ -37,7 +37,7 @@ public class Main {
         double[][] trainInput = new double[countTrain][inputs[0].length];
         double[][] trainOutput = new double[countTrain][outputs[0].length];
         int i;
-        for(i = 0; i < countTrain; i++) {
+        for (i = 0; i < countTrain; i++) {
             trainInput[i] = inputs[indexes[i]];
             trainOutput[i] = outputs[indexes[i]];
         }
@@ -45,9 +45,9 @@ public class Main {
         int countTest = inputs.length - countTrain;
         double[][] testInput = new double[countTest][inputs[0].length];
         double[][] testOutput = new double[countTest][outputs[0].length];
-        for(; i < inputs.length; i++) {
-            testInput[i-countTrain] = inputs[indexes[i]];
-            testOutput[i-countTrain] = outputs[indexes[i]];
+        for (; i < inputs.length; i++) {
+            testInput[i - countTrain] = inputs[indexes[i]];
+            testOutput[i - countTrain] = outputs[indexes[i]];
         }
 
         System.out.println("Train Input");
@@ -73,12 +73,15 @@ public class Main {
         double[][] testInput = split[2];
         double[][] testOutput = split[3];
 
-        Network model = new Network(inputs[0].length, 15, 15, 15, outputs[0].length);
-        model.train(trainInput, trainOutput, 1000, 50);
+        Network model = new Network(inputs[0].length, 10, 5, outputs[0].length);
+
+        model.train(trainInput, trainOutput, 100000);
 
         model.printParameters();
 
-        model.test(testInput, testOutput);
+        model.test(testInput, testOutput, true);
+
+        model.test(inputs, outputs, false);
     }
 
     private static double[][][] readSeedData() {
@@ -100,7 +103,7 @@ public class Main {
             }
 
             int choice = Integer.parseInt(data[7]);
-            outputs[i][choice-1] = 1;
+            outputs[i][choice - 1] = 1;
         }
         System.out.println("Processed input");
         System.out.println(Arrays.deepToString(inputs));
@@ -161,13 +164,7 @@ public class Main {
         Network model = new Network(2, 2, 2);
         model.train(inputs, outputs, 100000, 10);
 
-        int correct = 0;
-        for (int i = 0; i < inputs.length; i++) {
-            double[] result = model.predict(inputs[i]);
-            System.out.printf("%s, %s%n", result[0] > result[1], outputs[i][0] > outputs[i][1]);
-            if (result[0] > result[1] == outputs[i][0] > outputs[i][1]) correct++;
-        }
-        System.out.printf("%s/%s examples classified correctly%n", correct, inputs.length);
+        model.test(inputs, outputs, true);
         model.printParameters();
 
         while (true) {
