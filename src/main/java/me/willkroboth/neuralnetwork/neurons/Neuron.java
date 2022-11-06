@@ -30,9 +30,9 @@ public abstract class Neuron {
 
     protected abstract double recalculateDCdN();
 
-    protected abstract void calculateGradients();
+    public abstract void calculateGradients();
 
-    protected abstract void applyGradients(int examplesProcessed);
+    public abstract void applyGradients(int examplesProcessed);
 
     // Keep track of inputs and outputs
     protected final List<Axon> inputAxons = new ArrayList<>();

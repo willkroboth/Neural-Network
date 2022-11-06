@@ -21,12 +21,12 @@ public class InputNeuron extends Neuron {
     }
 
     @Override
-    protected void calculateGradients() {
+    public void calculateGradients() {
         // No internal gradients to calculate
     }
 
     @Override
-    protected void applyGradients(int examplesProcessed) {
+    public void applyGradients(int examplesProcessed) {
         // No internal gradients to apply
     }
 }

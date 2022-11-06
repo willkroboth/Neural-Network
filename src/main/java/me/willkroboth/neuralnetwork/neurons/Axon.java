@@ -2,8 +2,6 @@ package me.willkroboth.neuralnetwork.neurons;
 
 import me.willkroboth.neuralnetwork.Util;
 
-import java.util.List;
-
 public class Axon {
     private final Neuron input;
     private final Neuron output;
@@ -28,20 +26,14 @@ public class Axon {
         return output;
     }
 
-    public void calculateGradients(boolean updateWeight, double dCds) {
-        if (updateWeight) {
-            double dsdw = input.getActivation();
-            double dCdw = dCds * dsdw;
-            accumulatedDCdW += dCdw;
-        }
-        input.calculateGradients();
+    public void calculateGradients(double dCds) {
+        double dsdw = input.getActivation();
+        double dCdw = dCds * dsdw;
+        accumulatedDCdW += dCdw;
     }
 
-    public void applyGradients(boolean updateWeight, int examplesProcessed) {
-        if (updateWeight) {
-            weight = Util.updateValue(accumulatedDCdW/examplesProcessed, weight);
-            accumulatedDCdW = 0;
-        }
-        input.applyGradients(examplesProcessed);
+    public void applyGradients(int examplesProcessed) {
+        weight = Util.updateValue(accumulatedDCdW / examplesProcessed, weight);
+        accumulatedDCdW = 0;
     }
 }

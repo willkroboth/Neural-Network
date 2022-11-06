@@ -1,6 +1,5 @@
 package me.willkroboth.neuralnetwork.layers;
 
-import me.willkroboth.neuralnetwork.neurons.Neuron;
 import me.willkroboth.neuralnetwork.neurons.OutputNeuron;
 
 public class OutputLayer extends Layer<OutputNeuron> {
@@ -14,18 +13,6 @@ public class OutputLayer extends Layer<OutputNeuron> {
 
         for (int i = 0; i < results.length; i++) {
             neurons[i].setExpectedValue(results[i]);
-        }
-    }
-
-    public void calculateGradients() {
-        for (OutputNeuron neuron : neurons) {
-            neuron.calculateGradients();
-        }
-    }
-
-    public void applyGradients(int examplesProcessed) {
-        for(OutputNeuron neuron : neurons) {
-            neuron.applyGradients(examplesProcessed);
         }
     }
 }

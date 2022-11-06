@@ -75,7 +75,7 @@ public class Main {
 
         Network model = new Network(inputs[0].length, 10, 5, outputs[0].length);
 
-        model.train(trainInput, trainOutput, 100000);
+        model.train(trainInput, trainOutput, 20000);
 
         model.printParameters();
 

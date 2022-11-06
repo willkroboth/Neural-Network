@@ -18,7 +18,7 @@ public class Network {
         Layer<?> previousLayer = inputLayer;
         for (int i = 1; i < layerSizes.length; i++) {
             FullyConnectedLayer newLayer = new FullyConnectedLayer(layerSizes[i], previousLayer);
-            hiddenLayers[i-1] = newLayer;
+            hiddenLayers[i - 1] = newLayer;
             previousLayer = newLayer;
         }
         outputLayer = new OutputLayer(previousLayer);
@@ -32,7 +32,20 @@ public class Network {
     public void applyTrainingExample(double[] input, double[] output) {
         inputLayer.setActivations(input);
         outputLayer.setExpectedOutput(output);
-        outputLayer.calculateGradients();
+
+        for (FullyConnectedLayer layer : hiddenLayers) {
+            for (FullyConnectedNeuron neuron : layer) {
+                neuron.calculateGradients();
+            }
+        }
+    }
+
+    public void applyGradients(int examplesProcessed) {
+        for (FullyConnectedLayer layer : hiddenLayers) {
+            for (FullyConnectedNeuron neuron : layer) {
+                neuron.applyGradients(examplesProcessed);
+            }
+        }
     }
 
     public void train(double[][] inputs, double[][] outputs, int epochs) {
@@ -40,7 +53,7 @@ public class Network {
     }
 
     public void train(double[][] inputs, double[][] outputs, int epochs, int batchSize) {
-        if(inputs.length != outputs.length)
+        if (inputs.length != outputs.length)
             throw new IllegalArgumentException("Expected inputs (%s) to correspond to outputs (%s)".formatted(inputs.length, outputs.length));
         {
             int i = 0;
@@ -59,13 +72,13 @@ public class Network {
                 MSE /= batchSize;
                 System.out.printf("Epoch: %s, Cost: %s%n", j, MSE);
 
-                outputLayer.applyGradients(batchSize);
+                applyGradients(batchSize);
             }
         }
         double MSE = 0;
         for (int i = 0; i < inputs.length; i++) {
             double[] prediction = predict(inputs[i]);
-            for(int k = 0; k < outputs[i].length; k++) {
+            for (int k = 0; k < outputs[i].length; k++) {
                 MSE += Math.pow(prediction[k] - outputs[i][k], 2);
             }
 
@@ -82,22 +95,22 @@ public class Network {
 
             int correctChoice = Util.argMax(outputs[i]);
             int prediction = Util.argMax(result);
-            if(displayEachGuess) System.out.printf("Correct: %s, Predicted: %s%n", correctChoice, prediction);
-            if(correctChoice == prediction) correct++;
+            if (displayEachGuess) System.out.printf("Correct: %s, Predicted: %s%n", correctChoice, prediction);
+            if (correctChoice == prediction) correct++;
         }
         System.out.printf("%s/%s examples classified correctly%n", correct, inputs.length);
     }
 
     public void printParameters() {
         int layerIndex = 0;
-        for(FullyConnectedLayer layer : hiddenLayers) {
+        for (FullyConnectedLayer layer : hiddenLayers) {
             int neuronIndex = 0;
             for (FullyConnectedNeuron neuron : layer) {
                 System.out.printf("Layer %s, Neuron %s: ", layerIndex, neuronIndex);
                 neuron.printInformation();
                 neuronIndex++;
             }
-            layerIndex ++;
+            layerIndex++;
         }
     }
 }

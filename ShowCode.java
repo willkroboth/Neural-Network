@@ -59,16 +59,12 @@ public class Axon {
     calculateGradients(double dCds) {
         double dsdw = input.getActivation();
         double dCdw = dCds * dsdw;
-
         accumulatedDCdW += dCdw;
-
-        input.calculateGradients();
     }
 
     applyGradients(int examplesProcessed) {
         weight = Util.updateValue(accumulatedDCdW / examplesProcessed, weight);
         accumulatedDCdW = 0;
-        input.applyGradients(examplesProcessed);
     }
 }
 

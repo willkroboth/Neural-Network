@@ -37,7 +37,7 @@ public class FullyConnectedNeuron extends Neuron {
     }
 
     @Override
-    protected void calculateGradients() {
+    public void calculateGradients() {
         double dNds = activationFunction.derivative(weightedSum);
         double dCds = dCdN() * dNds;
 
@@ -46,17 +46,17 @@ public class FullyConnectedNeuron extends Neuron {
         accumulatedDCdb += dCdb;
 
         for(Axon axon : inputAxons) {
-            axon.calculateGradients(true, dCds);
+            axon.calculateGradients(dCds);
         }
     }
 
     @Override
-    protected void applyGradients(int examplesProcessed) {
+    public void applyGradients(int examplesProcessed) {
         bias = Util.updateValue(accumulatedDCdb/examplesProcessed, bias);
         accumulatedDCdb = 0;
 
         for (Axon axon : inputAxons) {
-            axon.applyGradients(true, examplesProcessed);
+            axon.applyGradients(examplesProcessed);
         }
     }
 
