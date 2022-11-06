@@ -45,7 +45,7 @@ public class Neuron {
         accumulatedDCdb = 0;
 
         for (Axon axon : inputAxons) {
-            axon.applyGradients(true, examplesProcessed);
+            axon.applyGradients(examplesProcessed);
         }
     }
 }
@@ -65,11 +65,9 @@ public class Axon {
         input.calculateGradients();
     }
 
-    applyGradients(boolean updateWeight, int examplesProcessed) {
-        if (updateWeight) {
-            weight = Util.updateValue(accumulatedDCdW/examplesProcessed, weight);
-            accumulatedDCdW = 0;
-        }
+    applyGradients(int examplesProcessed) {
+        weight = Util.updateValue(accumulatedDCdW / examplesProcessed, weight);
+        accumulatedDCdW = 0;
         input.applyGradients(examplesProcessed);
     }
 }
